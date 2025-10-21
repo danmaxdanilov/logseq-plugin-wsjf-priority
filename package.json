@@ -1,8 +1,8 @@
 {
   "name": "logseq-plugin-wsjf-priority",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Auto-calculate WSJF (Weighted Shortest Job First) priority score based on block properties",
-  "author": "Your Name",
+  "author": "Danilov Maksim",
   "license": "MIT",
   "logseq": {
     "id": "logseq-plugin-wsjf-priority",

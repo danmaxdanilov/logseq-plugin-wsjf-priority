@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Create plugin ZIP
+        run: |
+          mkdir -p release
+          cp -r dist package.json README.md release/
+          cd release
+          zip -r ../logseq-wsjf-priority-${{ github.ref_name }}.zip .
+          cd ..
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            logseq-wsjf-priority-${{ github.ref_name }}.zip
+            dist/index.html
+          body: |
+            ## WSJF Priority Calculator ${{ github.ref_name }}
+
+            ### 🎯 Features
+            - Automatic WSJF (Weighted Shortest Job First) calculation
+            - Smart color-coding based on priority (red/green/blue backgrounds)
+            - Intuitive dropdown interface for task prioritization
+            - Seamless integration with AwesomeProps plugin
+            - Hidden input properties for clean display
+
+            ### 📦 Installation
+            1. Download `logseq-wsjf-priority-${{ github.ref_name }}.zip`
+            2. Extract to a folder
+            3. In Logseq: Settings → Advanced → Enable Developer mode
+            4. Plugins → Load unpacked plugin → Select extracted folder
+
+            ### 🚀 Usage
+            - Place cursor in any block
+            - Type `/WSJF: Prioritize`
+            - Select values from dropdowns
+            - Watch WSJF score and color appear automatically!
+
+            ### 🎨 Color Coding
+            - 🔴 **Red:** 75-100% (Highest priority)
+            - 🟢 **Green:** 50-74% (High priority)
+            - 🔵 **Blue:** 25-49% (Medium priority)
+            - ⚪ **None:** 0-24% (Low priority)
+          draft: false
+          prerelease: false
