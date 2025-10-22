@@ -62,6 +62,13 @@ function createDropdownOptions(
     .join("");
 }
 
+async function showWSJFFormForBlock(uuid: string) {
+  // Select the target block
+  await logseq.Editor.selectBlock(uuid);
+  // Open form (uses whatever block is selected)
+  await showWSJFForm();
+}
+
 interface WSJFProperties {
   businessValue?: number;
   timeCriticality?: number;
@@ -315,13 +322,70 @@ async function showWSJFForm() {
       await logseq.Editor.upsertBlockProperty(currentBlock.uuid, ".rr", rr);
       await logseq.Editor.upsertBlockProperty(currentBlock.uuid, ".js", js);
       logseq.provideUI({ key: "wsjf-form-modal", template: "" });
-      logseq.UI.showMsg("Task prioritized!", "success");
+      //logseq.UI.showMsg("Task prioritized!", "success");
       setTimeout(() => updateBlockWSJF(currentBlock.uuid), 500);
     });
     cancelBtn?.addEventListener("click", () => {
       logseq.provideUI({ key: "wsjf-form-modal", template: "" });
     });
   }, 100);
+}
+
+//Migration function
+const MIGRATION_EMOJI = "➡️";
+const MAX_MIGRATIONS = 3;
+
+async function migrateTask(uuid: string) {
+  try {
+    const block = await logseq.Editor.getBlock(uuid, {
+      includeChildren: false,
+    });
+    if (!block?.content) return;
+
+    // Count existing migration emojis
+    const migrationCount = (
+      block.content.match(new RegExp(MIGRATION_EMOJI, "g")) || []
+    ).length;
+
+    if (migrationCount >= MAX_MIGRATIONS) {
+      logseq.UI.showMsg(
+        "⚠️ Task already migrated 3 times! Consider breaking it down or removing it.",
+        "warning",
+      );
+      return;
+    }
+
+    // Match task markers: TODO, LATER, NOW, DOING, DONE, WAITING, CANCELED, CANCELLED, IN-PROGRESS, etc.
+    const taskMarkerRegex =
+      /^(TODO|LATER|NOW|DOING|DONE|WAITING|CANCELED|CANCELLED|IN-PROGRESS)\s+/i;
+    const match = block.content.match(taskMarkerRegex);
+
+    let newContent: string;
+    if (match) {
+      // Insert emoji after the task marker
+      const marker = match[0]; // e.g., "TODO "
+      const rest = block.content.slice(marker.length);
+      newContent = marker + MIGRATION_EMOJI + " " + rest;
+    } else {
+      // No task marker, add emoji at the beginning
+      newContent = MIGRATION_EMOJI + " " + block.content;
+    }
+
+    await logseq.Editor.updateBlock(uuid, newContent);
+
+    const remaining = MAX_MIGRATIONS - migrationCount - 1;
+    if (remaining > 0) {
+      logseq.UI.showMsg(
+        `✅ Task migrated (${remaining} migration${remaining > 1 ? "s" : ""} remaining)`,
+        "success",
+      );
+    } else {
+      logseq.UI.showMsg("✅ Task migrated (final migration)", "warning");
+    }
+  } catch (error) {
+    console.error("Error migrating task:", error);
+    logseq.UI.showMsg("Error migrating task", "error");
+  }
 }
 
 // Main registration
@@ -331,12 +395,14 @@ function main() {
     await updatePageWSJF();
   });
   logseq.Editor.registerBlockContextMenuItem(
-    "Calculate WSJF for this block",
+    "Prioritisation for this block",
     async (e) => {
-      await updateBlockWSJF(e.uuid);
-      logseq.UI.showMsg("WSJF calculated", "success");
+      await showWSJFFormForBlock(e.uuid);
     },
   );
+  logseq.Editor.registerBlockContextMenuItem("Mark as Migrated", async (e) => {
+    await migrateTask(e.uuid);
+  });
   logseq.App.registerUIItem("toolbar", {
     key: "wsjf-calculator",
     template: `<a class="button" data-on-click="calculateWSJF" title="Calculate WSJF for current page"><i class="ti ti-calculator"></i></a>`,
@@ -363,7 +429,7 @@ function main() {
       }
     }
   });
-  logseq.UI.showMsg("WSJF Priority Calculator ready!", "success");
+  //logseq.UI.showMsg("WSJF Priority Calculator ready!", "success");
 }
 
 logseq.ready(main).catch(console.error);
