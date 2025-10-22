@@ -412,23 +412,23 @@ function main() {
       await updatePageWSJF();
     },
   });
-  logseq.DB.onChanged(async (e) => {
-    if (!e.blocks?.length) return;
-    for (const block of e.blocks) {
-      if (block.properties) {
-        const props = block.properties;
-        const hasWSJFProps =
-          getPropertyValue(props, "businessValue") !== undefined ||
-          getPropertyValue(props, "timeCriticality") !== undefined ||
-          getPropertyValue(props, "riskReduction") !== undefined ||
-          getPropertyValue(props, "jobSize") !== undefined;
-        if (hasWSJFProps)
-          setTimeout(() => {
-            updateBlockWSJF(block.uuid);
-          }, 300);
-      }
-    }
-  });
+  // logseq.DB.onChanged(async (e) => {
+  //   if (!e.blocks?.length) return;
+  //   for (const block of e.blocks) {
+  //     if (block.properties) {
+  //       const props = block.properties;
+  //       const hasWSJFProps =
+  //         getPropertyValue(props, "businessValue") !== undefined ||
+  //         getPropertyValue(props, "timeCriticality") !== undefined ||
+  //         getPropertyValue(props, "riskReduction") !== undefined ||
+  //         getPropertyValue(props, "jobSize") !== undefined;
+  //       if (hasWSJFProps)
+  //         setTimeout(() => {
+  //           updateBlockWSJF(block.uuid);
+  //         }, 300);
+  //     }
+  //   }
+  // });
   //logseq.UI.showMsg("WSJF Priority Calculator ready!", "success");
 }
 
