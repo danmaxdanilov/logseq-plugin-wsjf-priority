@@ -187,14 +187,6 @@ async function updatePageWSJF() {
             );
             updatedCount++;
           }
-          const colorClass = getWSJFColorClass(wsjfScore);
-          if (colorClass)
-            await logseq.Editor.upsertBlockProperty(
-              block.uuid,
-              ".color",
-              colorClass,
-            );
-          else await logseq.Editor.removeBlockProperty(block.uuid, ".color");
         }
       }
       if (block.children && block.children.length > 0) {
