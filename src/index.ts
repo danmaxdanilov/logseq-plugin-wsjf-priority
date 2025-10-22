@@ -11,28 +11,43 @@ const PROPERTY_MAPPINGS = {
 
 // Descriptive dropdowns for work task prioritisation
 const BUSINESS_VALUE_LABELS = [
-  { label: "Minor impact", value: 1 },
-  { label: "Noticeable benefit", value: 3 },
-  { label: "Major value", value: 5 },
-  { label: "Business game-changer", value: 8 },
+  { label: "1 - No user/business value", value: 1 },
+  { label: "2 - Very low impact or confidence", value: 2 },
+  { label: "3 - Low impact & confidence", value: 3 },
+  { label: "5 - Moderate impact, moderate confidence", value: 5 },
+  { label: "8 - High impact & confidence", value: 8 },
+  { label: "13 - Very high impact & confidence", value: 13 },
+  { label: "21 - Highest impact & confidence", value: 21 },
 ];
+
 const TIME_CRITICALITY_LABELS = [
-  { label: "No rush", value: 1 },
-  { label: "Should be done soon", value: 3 },
-  { label: "Deadline approaching", value: 5 },
-  { label: "Urgent/must do now", value: 8 },
+  { label: "1 - Not critical at all", value: 1 },
+  { label: "2 - Can wait till next review", value: 2 },
+  { label: "3 - Can wait for 4 sprints", value: 3 },
+  { label: "5 - Moderate urgency (3 sprints)", value: 5 },
+  { label: "8 - Quite urgent (2 sprints)", value: 8 },
+  { label: "13 - Needs next sprint", value: 13 },
+  { label: "21 - Must be next up", value: 21 },
 ];
+
 const RISK_REDUCTION_LABELS = [
-  { label: "Little/No risk/opportunity", value: 1 },
-  { label: "Helps/mitigates some risk", value: 3 },
-  { label: "Mitigates key risk or opens new value", value: 5 },
-  { label: "Removes critical risk / enables opportunity", value: 8 },
+  { label: "1 - No risk reduction", value: 1 },
+  { label: "2 - Reduces very minor risk", value: 2 },
+  { label: "3 - Reduces low probability/severity risk", value: 3 },
+  { label: "5 - Moderate risk reduction", value: 5 },
+  { label: "8 - High risk reduction", value: 8 },
+  { label: "13 - Removes very high risk", value: 13 },
+  { label: "21 - Prevents disaster or enables huge opportunity", value: 21 },
 ];
+
 const JOB_SIZE_LABELS = [
-  { label: "S - Minimal effort", value: 1 },
-  { label: "M - Manageable / a few hours", value: 3 },
-  { label: "L - Medium / a day or two", value: 5 },
-  { label: "XL - Big / a week+", value: 8 },
+  { label: "1 - Trivial/smallest chunk", value: 1 },
+  { label: "2 - A day or less", value: 2 },
+  { label: "3 - A quarter of a sprint", value: 3 },
+  { label: "5 - Half a sprint", value: 5 },
+  { label: "8 - One sprint", value: 8 },
+  { label: "13 - One to two sprints", value: 13 },
+  { label: "21 - Two sprints or more (should be split)", value: 21 },
 ];
 
 function createDropdownOptions(
@@ -94,19 +109,6 @@ function extractWSJFProperties(properties: any): WSJFProperties {
   };
 }
 
-// Map wsjfScore (max 24) to Logseq color-level
-function getWSJFColorClass(wsjfScore: number): string {
-  // 8+8+8 maximal numerator, 1 minimal denominator
-  const maxScore = 24;
-  const percent = Math.round((wsjfScore / maxScore) * 100);
-  if (percent >= 90) return "level-2"; // Red/pink
-  if (percent >= 75) return "level-1"; // Yellow
-  if (percent >= 60) return "level-4"; // Green
-  if (percent >= 40) return "level-5"; // Blue
-  if (percent >= 20) return "level-6"; // Purple
-  return ""; // No color
-}
-
 // --- MAIN FUNCTION for block updates
 async function updateBlockWSJF(uuid: string) {
   try {
@@ -120,10 +122,9 @@ async function updateBlockWSJF(uuid: string) {
 
     let backgroundColor = "";
     if (wsjfScore !== null) {
-      const percent = Math.round((wsjfScore / 24) * 100);
-      if (percent >= 75) backgroundColor = "red";
-      else if (percent >= 50) backgroundColor = "green";
-      else if (percent >= 25) backgroundColor = "blue";
+      if (wsjfScore >= 10) backgroundColor = "red";
+      else if (wsjfScore >= 4) backgroundColor = "green";
+      else if (wsjfScore >= 1.5) backgroundColor = "blue";
       else backgroundColor = "";
 
       // Official block color property!
