@@ -6,7 +6,7 @@ const PROPERTY_MAPPINGS = {
   timeCriticality: [".tc", "tc", ".time-criticality", "time-criticality"],
   riskReduction: [".rr", "rr", ".risk-reduction", "risk-reduction"],
   jobSize: [".js", "js", ".job-size", "job-size"],
-  wsjf: ["WSJF", "wsjf", "priority"],
+  wsjf: ["wsjf", "wsjf", "priority"],
 };
 
 // Descriptive dropdowns for work task prioritisation
@@ -148,13 +148,13 @@ async function updateBlockWSJF(uuid: string) {
       if (hasLowercase) {
         await logseq.Editor.removeBlockProperty(uuid, "wsjf");
       }
-      const currentUpper = block.properties["WSJF"];
+      const currentUpper = block.properties["wsjf"];
       if (currentUpper !== wsjfScore) {
-        await logseq.Editor.upsertBlockProperty(uuid, "WSJF", wsjfScore);
+        await logseq.Editor.upsertBlockProperty(uuid, "wsjf", wsjfScore);
       }
     } else {
-      if (block.properties["WSJF"] !== undefined) {
-        await logseq.Editor.removeBlockProperty(uuid, "WSJF");
+      if (block.properties["wsjf"] !== undefined) {
+        await logseq.Editor.removeBlockProperty(uuid, "wsjf");
       }
       if (hasLowercase) {
         await logseq.Editor.removeBlockProperty(uuid, "wsjf");
@@ -186,11 +186,11 @@ async function updatePageWSJF() {
         const wsjfProps = extractWSJFProperties(block.properties);
         const wsjfScore = calculateWSJF(wsjfProps);
         if (wsjfScore !== null) {
-          const currentUpper = block.properties["WSJF"];
+          const currentUpper = block.properties["wsjf"];
           if (currentUpper !== wsjfScore) {
             await logseq.Editor.upsertBlockProperty(
               block.uuid,
-              "WSJF",
+              "wsjf",
               wsjfScore,
             );
             updatedCount++;
@@ -228,7 +228,7 @@ async function showWSJFForm() {
     ? extractWSJFProperties(currentBlock.properties)
     : {};
   const html = `
-    <div id="wsjf-form" style="padding: 20px; background: var(--ls-primary-background-color); border-radius: 8px; max-width: 400px;">
+    <div id="wsjf-form" style="padding: 20px; background: var(--ls-primary-background-color); border-radius: 8px; width: 100%; max-width: 400px; margin: 0 auto;">
       <h3 style="margin-top: 0; color: var(--ls-primary-text-color);">🎯 Prioritize</h3>
       <p style="font-size: 12px; color: var(--ls-secondary-text-color); margin-bottom: 20px;">
         Score each factor for this work task.
@@ -289,6 +289,10 @@ async function showWSJFForm() {
       transform: "translate(-50%, -50%)",
       zIndex: 999,
       boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+      width: "100vw", // Новое: растянуть до ширины экрана
+      maxWidth: "400px", // Ограничить максимальную ширину
+      padding: "0",
+      overflow: "auto",
     },
   });
 
