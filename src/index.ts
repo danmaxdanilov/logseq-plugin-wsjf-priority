@@ -21,13 +21,13 @@ const BUSINESS_VALUE_LABELS = [
 ];
 
 const TIME_CRITICALITY_LABELS = [
-  { label: "1 - Not critical at all", value: 1 },
-  { label: "2 - Can wait till next review", value: 2 },
-  { label: "3 - Can wait for 4 sprints", value: 3 },
-  { label: "5 - Moderate urgency (3 sprints)", value: 5 },
-  { label: "8 - Quite urgent (2 sprints)", value: 8 },
-  { label: "13 - Needs next sprint", value: 13 },
-  { label: "21 - Must be next up", value: 21 },
+  { label: "1 - Someday/No deadline", value: 1 },
+  { label: "2 - This quarter", value: 2 },
+  { label: "3 - This month", value: 3 },
+  { label: "5 - This week", value: 5 },
+  { label: "8 - Next 2-3 days", value: 8 },
+  { label: "13 - Today", value: 13 },
+  { label: "21 - Now/Critical window", value: 21 },
 ];
 
 const RISK_REDUCTION_LABELS = [
@@ -41,13 +41,13 @@ const RISK_REDUCTION_LABELS = [
 ];
 
 const JOB_SIZE_LABELS = [
-  { label: "1 - Trivial/smallest chunk", value: 1 },
-  { label: "2 - A day or less", value: 2 },
-  { label: "3 - A quarter of a sprint", value: 3 },
-  { label: "5 - Half a sprint", value: 5 },
-  { label: "8 - One sprint", value: 8 },
-  { label: "13 - One to two sprints", value: 13 },
-  { label: "21 - Two sprints or more (should be split)", value: 21 },
+  { label: "1 - Autopilot (5-15 min)", value: 1 },
+  { label: "2 - Light thinking (30-60 min)", value: 2 },
+  { label: "3 - Focused work (2-3 hours)", value: 3 },
+  { label: "5 - Deep work (half day)", value: 5 },
+  { label: "8 - Complex analysis (full day)", value: 8 },
+  { label: "13 - Research/Learning (2-3 days)", value: 13 },
+  { label: "21 - Major investigation (week+, split it)", value: 21 },
 ];
 
 function createDropdownOptions(
